@@ -20,8 +20,9 @@ import { playerUrl } from '../helpers/urls'
 test('player is blocked from booking when max active reservations is reached', async ({ page }) => {
   const player = new PlayerPage(page)
 
-  // ── Step 1: Set up with demo seed — player-1 has 2 upcoming booked reservations ──
-  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true }))
+  // ── Step 1: Set up with full seed — player-7 has 2 upcoming booked reservations ──
+  // The 'full' seed is specifically designed with players 7–12 having maxed-out bookings.
+  await page.goto(playerUrl('reservations', { seed: 'full', as: 'player-7', reset: true }))
 
   await player.selectTab('upcoming')
 

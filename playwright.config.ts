@@ -9,7 +9,7 @@ import { defineConfig, devices } from '@playwright/test'
  *
  * Set SHELL_URL in your environment to override (e.g. for a deployed preview).
  */
-const SHELL_URL = process.env.SHELL_URL ?? 'http://127.0.0.1:5000'
+const SHELL_URL = process.env.SHELL_URL ?? 'https://club-shell.vercel.app'
 
 export default defineConfig({
   testDir: './tests',

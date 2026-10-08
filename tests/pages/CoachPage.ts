@@ -34,7 +34,7 @@ export class CoachPage {
   }
 
   async goToCreateLesson() {
-    await this.nav('New lesson').click()
+    await this.nav('Create lesson').click()
     await expect(this.page.getByRole('heading', { name: 'Create lesson' })).toBeVisible()
   }
 

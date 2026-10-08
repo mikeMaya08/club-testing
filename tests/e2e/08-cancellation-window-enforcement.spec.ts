@@ -25,7 +25,9 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
 
   // now=2026-10-10T10:00 — the demo seed may have booked reservations today
   // Use player-1 (Lucía Fernández) who has future reservations in the demo seed
-  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true }))
+  // The 'full' seed has reservations on 2026-10-10 starting before 14:00 (within
+  // the 4-hour window from the pinned clock at 10:00), so Cancel is disabled.
+  await page.goto(playerUrl('reservations', { seed: 'full', as: 'player-1', reset: true }))
 
   await player.selectTab('upcoming')
 

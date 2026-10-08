@@ -44,6 +44,9 @@ test('admin court block cancels overlapping reservation and notifies player', as
   // We validate the same end-state here through the force-cancel API (same code path
   // as api.createBlock which internally calls cancelReservation for each overlap).
   await admin.cancelReservation(resId)
+
+  // Clear the booked filter so the now-cancelled row stays visible
+  await page.getByTestId('filter-clear').click()
   await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('cancelled')
 
   // ── Step 3: Calendar block warning appears for new overlapping drags ───────

@@ -19,7 +19,7 @@ test('admin cancels reservation and player is notified', async ({ page }) => {
 
   // ── Step 1: Admin cancels a booked reservation for player-1 ───────────────
   await page.goto(adminUrl('reservations', { seed: 'demo', reset: true }))
-  admin.loginAs('admin-1') // already logged in via ?as=
+  // Already logged in via ?as=admin-1 — no loginAs() needed
 
   // Filter to booked reservations belonging to player-1 (Lucía Fernández)
   await page.getByTestId('filter-status').selectOption('booked')

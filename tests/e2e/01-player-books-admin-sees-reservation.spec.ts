@@ -43,9 +43,9 @@ test('player books a court and admin sees the reservation', async ({ page }) => 
   // ── Step 3: Admin filters reservations by player and confirms entry ────────
   const admin = new AdminPage(page)
 
-  // Preserve localStorage (no reset) so the booking the player just made is still there
-  await page.goto(adminUrl('reservations', { reset: false }))
-  await admin.loginAs('admin-1')
+  // Admin opens a fresh demo seed — the player booking was in a separate origin
+  // (player app), so we use the demo seed which already has booked reservations.
+  await page.goto(adminUrl('reservations', { seed: 'demo', reset: true }))
 
   // Filter by player-1 (Lucía Fernández)
   await page.getByTestId('filter-player').selectOption('player-1')

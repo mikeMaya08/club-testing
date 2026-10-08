@@ -37,18 +37,18 @@ test('admin cancels reservation and player is notified', async ({ page }) => {
   await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('cancelled')
 
   // ── Step 3: Player checks their History tab ────────────────────────────────
-  // The player app is on a different origin — it has its own localStorage.
-  // We use the demo seed (same data) with reset=true so the same reservation IDs exist.
-  // The admin cancelled res is stored in admin's origin; on the player side we
-  // verify the demo seed itself has cancelled reservations for player-1.
+  // The player and admin apps are deployed on different Vercel origins and do
+  // NOT share localStorage. We load the player app fresh with the same demo
+  // seed (reset=true) — the demo seed always includes at least one cancelled
+  // reservation for player-1 in History, which is what we verify here.
   const player = new PlayerPage(page)
 
   await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true }))
   await player.selectTab('history')
 
-  // The demo seed for player-1 includes at least one historical cancelled reservation
-  const cancelledRows = page.locator('[data-testid^="reservation-"][data-status="cancelled"]')
-  await expect(cancelledRows.first()).toBeVisible()
+  // The demo seed for player-1 always contains cancelled reservations in History.
+  const cancelledRow = page.locator('[data-testid^="reservation-"][data-status="cancelled"]').first()
+  await expect(cancelledRow).toBeVisible()
 
   // ── Step 4: Notification bell shows a cancellation message ────────────────
   await player.openNotifications()

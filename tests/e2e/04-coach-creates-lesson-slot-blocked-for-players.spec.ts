@@ -17,9 +17,12 @@ import { coachUrl, playerUrl } from '../helpers/urls'
 test('coach creates lesson and slot is blocked for players', async ({ page }) => {
   const coach = new CoachPage(page)
 
-  // ── Step 1: Coach logs in and goes straight to the Create Lesson page ──────
-  // Navigate directly to /coach/create to avoid fragile nav-link clicks
-  await page.goto(coachUrl('create', { seed: 'empty', as: 'coach-1', reset: true }))
+  // ── Step 1: Coach logs in and navigates to the Create Lesson page ──────────
+  // Navigate to the coach home (Schedule) first so the app boots and auth is set,
+  // then follow the "New lesson" nav link — direct /create deeplinks may not render
+  // the form because the app may redirect unauthenticated routes on load.
+  await page.goto(coachUrl('', { seed: 'empty', as: 'coach-1', reset: true, now: FIXED_NOW }))
+  await coach.goToCreateLesson()
 
   // ── Step 2: Create the lesson ──────────────────────────────────────────────
   // Court 2 is a hard court with lights — safe for a 14:00 slot

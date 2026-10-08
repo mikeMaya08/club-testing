@@ -15,13 +15,12 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI
-    ? [['@muuktest/amikoo-reporter'], ['html', { open: 'never' }]]
-    : [['html', { open: 'never' }], ['list']],
+  reporter: [['@muuktest/amikoo-reporter'], ['html', { open: 'never' }]],
   use: {
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on',
+    viewport: { width: 1280, height: 720 },
   },
   projects: [
     {

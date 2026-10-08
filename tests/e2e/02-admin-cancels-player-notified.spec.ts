@@ -31,7 +31,9 @@ test('admin cancels reservation and player is notified', async ({ page }) => {
   const resId = await admin.resIdFromRow(row)
   await admin.cancelReservation(resId)
 
-  // ── Step 2: Row status updates in-place to "cancelled" ────────────────────
+  // ── Step 2: Clear the status filter so the cancelled row is still visible ──
+  // The "booked" filter hides cancelled rows; clear it to see the updated status.
+  await page.getByTestId('filter-clear').click()
   await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('cancelled')
 
   // ── Step 3: Player checks their History tab ────────────────────────────────

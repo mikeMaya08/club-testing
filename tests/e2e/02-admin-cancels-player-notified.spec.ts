@@ -38,17 +38,16 @@ test('admin cancels reservation and player is notified', async ({ page }) => {
 
   // ── Step 3: Player checks their History tab ────────────────────────────────
   // The player app is on a different origin — it has its own localStorage.
-  // We use the demo seed (same data) with reset=true so the same reservation IDs exist.
-  // The admin cancelled res is stored in admin's origin; on the player side we
-  // verify the demo seed itself has cancelled reservations for player-1.
+  // We navigate with reset=false so the store already contains the cancellation
+  // the admin just performed (same shared in-memory store, same seed session).
   const player = new PlayerPage(page)
 
-  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true }))
+  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: false }))
   await player.selectTab('history')
 
-  // The demo seed for player-1 includes at least one historical cancelled reservation
-  const cancelledRows = page.locator('[data-testid^="reservation-"][data-status="cancelled"]')
-  await expect(cancelledRows.first()).toBeVisible()
+  // Assert the specific reservation we just cancelled appears as "cancelled"
+  // via its status badge (data-testid="reservation-status-{resId}").
+  await expect(page.getByTestId(`reservation-status-${resId}`)).toHaveText('cancelled')
 
   // ── Step 4: Notification bell shows a cancellation message ────────────────
   await player.openNotifications()

@@ -27,7 +27,7 @@ test('admin court block cancels overlapping reservation and notifies player', as
 
   // Filter to booked reservations on court-1
   await page.getByTestId('filter-status').selectOption('booked')
-  await page.getByTestId('filter-court').selectOption('court-1')
+  await page.getByTestId('filter-court').selectOption({ label: 'Court 1' })
 
   const row = admin.firstRowWithStatus('booked')
   await expect(row).toBeVisible()

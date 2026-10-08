@@ -49,9 +49,12 @@ test('player is blocked from booking when max active reservations is reached', a
   // ── Step 3: An error toast is displayed; the modal stays open ────────────
   // useRun() surfaces all rule errors as toasts with data-kind="error".
   // The MAX_ACTIVE rule fires and the booking is rejected.
-  await expect(
-    page.locator('[data-testid="toast"][data-kind="error"]')
-  ).toBeVisible()
+  // The toast auto-dismisses after 3 s — assert immediately after clicking confirm.
+  const errorToast = page.locator('[data-testid="toast"][data-kind="error"]')
+  await expect(errorToast).toBeVisible({ timeout: 5000 })
+
+  // The modal must remain open (booking was rejected, not closed on success).
+  await expect(page.getByTestId('booking-modal')).toBeVisible()
 
   // Navigate back to Upcoming; count must not have increased
   await player.goToReservations()

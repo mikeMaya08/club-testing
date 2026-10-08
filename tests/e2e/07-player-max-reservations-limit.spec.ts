@@ -46,10 +46,11 @@ test('player is blocked from booking when max active reservations is reached', a
   // Step 3 — try to confirm
   await page.getByTestId('booking-confirm').click()
 
-  // ── Step 3: An error is displayed; no new reservation is created ──────────
-  // The booking modal should show the error (stays open or shows toast)
+  // ── Step 3: An error toast is displayed; the modal stays open ────────────
+  // useRun() surfaces all rule errors as toasts with data-kind="error".
+  // The MAX_ACTIVE rule fires and the booking is rejected.
   await expect(
-    page.getByText(/maximum.*reservations|too many bookings|limit reached/i)
+    page.locator('[data-testid="toast"][data-kind="error"]')
   ).toBeVisible()
 
   // Navigate back to Upcoming; count must not have increased

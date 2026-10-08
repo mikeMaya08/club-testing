@@ -49,16 +49,10 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
     }
   }
 
-  // Assert the found button is indeed disabled
+  // Assert the found button is indeed disabled (checks both the HTML disabled
+  // attribute and aria-disabled="true" for accessibility-based implementations).
   const isDisabled = await disabledCancelBtn.evaluate((el) =>
     (el as HTMLButtonElement).disabled || el.getAttribute('aria-disabled') === 'true'
-  )
-  expect(isDisabled).toBe(true)
-
-  // The button may carry a title, aria-label, or be wrapped in a tooltip span.
-  // We just assert it is not clickable (disabled or aria-disabled).
-  const isDisabled = await disabledCancelBtn.evaluate((el) =>
-    el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true'
   )
   expect(isDisabled).toBe(true)
 

@@ -1,10 +1,12 @@
 /**
- * URL helpers for the Baseline Tennis Club sandbox.
+ * URL helpers for the Baseline Tennis Club.
  *
- * All three sub-apps are proxied by the shell on the same origin so they share
- * localStorage. Pass query params recognised by club-store to control the
- * deterministic test environment:
+ * Each sub-app is deployed independently on Vercel:
+ *   Admin  → https://club-admin-omega.vercel.app/admin/...
+ *   Coach  → https://club-coach-ten.vercel.app/coach/...
+ *   Player → https://club-player.vercel.app/player/...
  *
+ * Pass query params recognised by club-store to control the test environment:
  *   reset=1          — wipe and re-seed localStorage before mounting
  *   seed=demo|empty|full — which seed to use (default: demo)
  *   as=<userId>      — pre-login as this user (skips the login page)
@@ -13,6 +15,10 @@
  */
 
 export const FIXED_NOW = '2026-10-10T10:00:00'
+
+const ADMIN_BASE  = process.env.ADMIN_URL  ?? 'https://club-admin-omega.vercel.app'
+const COACH_BASE  = process.env.COACH_URL  ?? 'https://club-coach-ten.vercel.app'
+const PLAYER_BASE = process.env.PLAYER_URL ?? 'https://club-player.vercel.app'
 
 /** Build a query string from a plain object, omitting undefined values. */
 function qs(params: Record<string, string | undefined>): string {
@@ -27,7 +33,7 @@ export function adminUrl(
   opts: { seed?: 'demo' | 'empty' | 'full'; as?: string; now?: string; reset?: boolean } = {},
 ): string {
   const { seed = 'demo', as = 'admin-1', now = FIXED_NOW, reset = true } = opts
-  return `/admin${path ? `/${path}` : ''}${qs({ reset: reset ? '1' : undefined, seed, as, now })}`
+  return `${ADMIN_BASE}/admin${path ? `/${path}` : ''}${qs({ reset: reset ? '1' : undefined, seed, as, now })}`
 }
 
 // ─── Player ───────────────────────────────────────────────────────────────────
@@ -37,7 +43,7 @@ export function playerUrl(
   opts: { seed?: 'demo' | 'empty' | 'full'; as?: string; now?: string; reset?: boolean } = {},
 ): string {
   const { seed = 'demo', as, now = FIXED_NOW, reset = false } = opts
-  return `/player${path ? `/${path}` : ''}${qs({ reset: reset ? '1' : undefined, seed, as, now })}`
+  return `${PLAYER_BASE}/player${path ? `/${path}` : ''}${qs({ reset: reset ? '1' : undefined, seed, as, now })}`
 }
 
 // ─── Coach ────────────────────────────────────────────────────────────────────
@@ -47,5 +53,5 @@ export function coachUrl(
   opts: { seed?: 'demo' | 'empty' | 'full'; as?: string; now?: string; reset?: boolean } = {},
 ): string {
   const { seed = 'demo', as, now = FIXED_NOW, reset = false } = opts
-  return `/coach${path ? `/${path}` : ''}${qs({ reset: reset ? '1' : undefined, seed, as, now })}`
+  return `${COACH_BASE}/coach${path ? `/${path}` : ''}${qs({ reset: reset ? '1' : undefined, seed, as, now })}`
 }

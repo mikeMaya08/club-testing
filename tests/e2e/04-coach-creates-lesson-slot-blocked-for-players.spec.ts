@@ -21,7 +21,7 @@ test('coach creates lesson and slot is blocked for players', async ({ page }) =>
   // Navigate to the coach home (Schedule) first so the app boots and auth is set,
   // then follow the "New lesson" nav link — direct /create deeplinks may not render
   // the form because the app may redirect unauthenticated routes on load.
-  await page.goto(coachUrl('', { seed: 'empty', as: 'coach-1', reset: true }))
+  await page.goto(coachUrl('', { seed: 'empty', as: 'coach-1', reset: true, now: FIXED_NOW }))
   await coach.goToCreateLesson()
 
   // ── Step 2: Create the lesson ──────────────────────────────────────────────

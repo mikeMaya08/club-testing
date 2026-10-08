@@ -29,14 +29,31 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
 
   await player.selectTab('upcoming')
 
-  // Find a cancel button that is disabled — the app may use either the HTML
-  // `disabled` attribute or `aria-disabled="true"` for the cancel-window guard.
-  const disabledCancelBtn = page
-    .locator('[data-testid^="cancel-btn-"]')
-    .filter({ has: page.locator('[disabled], [aria-disabled="true"]') })
-    .first()
+  // Find all cancel buttons; pick the first one that is disabled.
+  // The `disabled` attribute lives on the button element itself, not a child,
+  // so `.filter({ has: locator('[disabled]') })` won't match — we iterate instead.
+  const allCancelBtns = page.locator('[data-testid^="cancel-btn-"]')
+  await expect(allCancelBtns.first()).toBeVisible()
 
-  await expect(disabledCancelBtn).toBeVisible()
+  // Grab the first button that reports itself as disabled.
+  const count = await allCancelBtns.count()
+  let disabledCancelBtn = allCancelBtns.first() // fallback — expect assertion will catch it
+  for (let i = 0; i < count; i++) {
+    const btn = allCancelBtns.nth(i)
+    const disabled = await btn.evaluate((el) =>
+      (el as HTMLButtonElement).disabled || el.getAttribute('aria-disabled') === 'true'
+    )
+    if (disabled) {
+      disabledCancelBtn = btn
+      break
+    }
+  }
+
+  // Assert the found button is indeed disabled
+  const isDisabled = await disabledCancelBtn.evaluate((el) =>
+    (el as HTMLButtonElement).disabled || el.getAttribute('aria-disabled') === 'true'
+  )
+  expect(isDisabled).toBe(true)
 
   // The button may carry a title, aria-label, or be wrapped in a tooltip span.
   // We just assert it is not clickable (disabled or aria-disabled).

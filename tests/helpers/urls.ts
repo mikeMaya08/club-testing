@@ -49,7 +49,7 @@ export function playerUrl(
 // ─── Coach ────────────────────────────────────────────────────────────────────
 
 export function coachUrl(
-  path: '' | `lessons/${string}` | 'create' | 'students' = '',
+  path: '' | `lessons/${string}` | 'create' | 'students' | 'activity' = '',
   opts: { seed?: 'demo' | 'empty' | 'full'; as?: string; now?: string; reset?: boolean } = {},
 ): string {
   const { seed = 'demo', as, now = FIXED_NOW, reset = false } = opts

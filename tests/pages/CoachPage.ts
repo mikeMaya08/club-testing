@@ -2,7 +2,8 @@ import { type Page, type Locator, expect } from '@playwright/test'
 
 /**
  * Page object for the Coach app.
- * Covers login, lesson creation, lesson detail, and attendance marking.
+ * Covers login, lesson creation, lesson detail, attendance marking,
+ * and the new Activity page (club-coach PR #2 – feat/activity-log).
  */
 export class CoachPage {
   readonly page: Page
@@ -36,6 +37,12 @@ export class CoachPage {
   async goToCreateLesson() {
     await this.nav('New lesson').click()
     await expect(this.page.getByRole('heading', { name: 'Create lesson' })).toBeVisible()
+  }
+
+  /** Navigate to the Activity page via the nav link. */
+  async goToActivity() {
+    await this.nav('Activity').click()
+    await expect(this.page.getByRole('heading', { name: 'Activity' })).toBeVisible()
   }
 
   // ─── Create lesson ─────────────────────────────────────────────────────────
@@ -95,5 +102,47 @@ export class CoachPage {
     await btn.click()
     // Wait for the pill to become active (aria-pressed="true")
     await expect(btn).toHaveAttribute('aria-pressed', 'true')
+  }
+
+  // ─── Activity page ─────────────────────────────────────────────────────────
+
+  /**
+   * Returns the filter chip button by its visible label.
+   * Chips use role="button" with aria-pressed to indicate the active filter.
+   */
+  activityFilter(label: 'All' | 'My lessons' | 'Notes and templates'): Locator {
+    return this.page
+      .getByRole('group', { name: 'Filter activity' })
+      .getByRole('button', { name: label })
+  }
+
+  /**
+   * Click an activity filter chip and wait for it to become active
+   * (aria-pressed="true").
+   */
+  async selectActivityFilter(label: 'All' | 'My lessons' | 'Notes and templates') {
+    const chip = this.activityFilter(label)
+    await chip.click()
+    await expect(chip).toHaveAttribute('aria-pressed', 'true')
+  }
+
+  /** Returns the ordered list of activity events. */
+  activityList(): Locator {
+    return this.page.locator('ol').filter({ has: this.page.locator('li') })
+  }
+
+  /** Returns a single activity list item by its 1-based index. */
+  activityItem(index: number): Locator {
+    return this.activityList().locator('li').nth(index - 1)
+  }
+
+  /** Returns the "No activity yet." empty-state element. */
+  emptyState(): Locator {
+    return this.page.getByText('No activity yet.')
+  }
+
+  /** Returns the "Show more" button when pagination is available. */
+  showMoreButton(): Locator {
+    return this.page.getByRole('button', { name: /Show more/ })
   }
 }

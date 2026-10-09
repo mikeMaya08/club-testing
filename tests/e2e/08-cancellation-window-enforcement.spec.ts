@@ -29,17 +29,18 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
 
   await player.selectTab('upcoming')
 
-  // Find a cancel button that is disabled — the app may use either the HTML
-  // `disabled` attribute or `aria-disabled="true"` for the cancel-window guard.
+  // The Reservations.tsx cancel button uses the native HTML `disabled` attribute
+  // directly on the <button> element when the cancellation window has passed.
+  // We must match the attribute on the button itself, not on a child element.
+  // Playwright's attribute filter does exactly that.
   const disabledCancelBtn = page
     .locator('[data-testid^="cancel-btn-"]')
-    .filter({ has: page.locator('[disabled], [aria-disabled="true"]') })
+    .filter({ hasAttribute: 'disabled' })
     .first()
 
   await expect(disabledCancelBtn).toBeVisible()
 
-  // The button may carry a title, aria-label, or be wrapped in a tooltip span.
-  // We just assert it is not clickable (disabled or aria-disabled).
+  // Double-check the element truly carries the disabled attribute
   const isDisabled = await disabledCancelBtn.evaluate((el) =>
     el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true'
   )

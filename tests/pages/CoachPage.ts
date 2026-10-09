@@ -55,7 +55,13 @@ export class CoachPage {
   }): Promise<string> {
     const { title, courtName, date, start, end, capacity = 4 } = opts
 
-    await this.page.getByPlaceholder('Serve clinic').fill(title)
+    // Wait for the Create Lesson form heading before interacting with fields.
+    // This ensures the form is fully rendered after direct URL navigation.
+    await expect(this.page.getByRole('heading', { name: 'Create lesson' })).toBeVisible()
+
+    // Target the title input by its label — more robust than getByPlaceholder
+    // and works even if the placeholder text changes.
+    await this.page.getByLabel('Title').fill(title)
     await this.page.getByText('Choose a court').click()
     await this.page.getByRole('option', { name: courtName }).click()
     await this.page.locator('input[type="date"]').fill(date)

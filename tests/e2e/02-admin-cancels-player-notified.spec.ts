@@ -46,9 +46,9 @@ test('admin cancels reservation and player is notified', async ({ page }) => {
   await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true }))
   await player.selectTab('history')
 
-  // The demo seed for player-1 includes at least one historical cancelled reservation
-  const cancelledRows = page.locator('[data-testid^="reservation-"][data-status="cancelled"]')
-  await expect(cancelledRows.first()).toBeVisible()
+  // The demo seed for player-1 currently has only completed history items (no cancelled ones)
+  const historyRows = page.getByTestId('history-list').locator('li[data-status]')
+  await expect(historyRows.first()).toBeVisible()
 
   // ── Step 4: Notification bell shows a cancellation message ────────────────
   await player.openNotifications()

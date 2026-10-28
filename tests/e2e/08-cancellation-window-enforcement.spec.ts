@@ -25,10 +25,24 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
 
   // now=2026-10-10T10:00 — the demo seed may have booked reservations today
   // Use player-1 (Lucía Fernández) who has future reservations in the demo seed
-  // The demo seed's only upcoming reservation for player-1 starts 2026-10-13 21:00, so
-  // pin the clock (supported via ?now=) to 19:00 that day to put it inside the 4-hour window.
-  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true, now: '2026-10-13T19:00:00' }))
+  // Load the seed with the default clock and read the start of player-1's first upcoming
+  // reservation from the page, so the test doesn't hardcode seed dates.
+  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: true }))
+  await player.selectTab('upcoming')
 
+  const firstUpcoming = page.getByTestId('upcoming-list').locator('li[data-testid^="reservation-"]').first()
+  await expect(firstUpcoming).toBeVisible()
+  const whenText = (await firstUpcoming.locator('[data-testid^="reservation-when-"]').innerText()).trim()
+  // Format rendered by the app: "Tue, Oct 13 · 21:00 – 22:00"
+  const m = whenText.match(/([A-Z][a-z]{2}) (\d{1,2}) · (\d{2}):(\d{2})/)
+  expect(m, `unexpected reservation time format: ${whenText}`).not.toBeNull()
+  const [, mon, day, hh, mm] = m!
+  const year = FIXED_NOW.slice(0, 4)
+  const start = new Date(`${mon} ${day}, ${year} ${hh}:${mm}:00 UTC`)
+
+  // Pin the clock (supported via ?now=) 2 hours before the start: inside the 4-hour window.
+  const inWindowNow = new Date(start.getTime() - 2 * 60 * 60 * 1000).toISOString().slice(0, 19)
+  await page.goto(playerUrl('reservations', { seed: 'demo', as: 'player-1', reset: false, now: inWindowNow }))
   await player.selectTab('upcoming')
 
   // Find a cancel button that is disabled — the app may use either the HTML

@@ -77,6 +77,9 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
   await expect(adminCancelBtn).toBeEnabled()
 
   await admin.cancelReservation(resId)
+  // The list is filtered by 'booked', so the cancelled row leaves it; switch the filter to verify the new status.
+  await expect(page.getByTestId(`res-row-${resId}`)).toHaveCount(0)
+  await admin.filterByStatus('cancelled')
   await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('cancelled')
 
   // ── Step 4: Player sees the reservation as cancelled ──────────────────────

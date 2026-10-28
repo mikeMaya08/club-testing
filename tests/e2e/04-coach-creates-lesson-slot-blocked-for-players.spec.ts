@@ -19,7 +19,9 @@ test('coach creates lesson and slot is blocked for players', async ({ page }) =>
 
   // ── Step 1: Coach logs in and goes straight to the Create Lesson page ──────
   // Navigate directly to /coach/create to avoid fragile nav-link clicks
-  await page.goto(coachUrl('create', { seed: 'empty', as: 'coach-1', reset: true }))
+  await page.goto(coachUrl('', { seed: 'empty', as: 'coach-1', reset: true }))
+  await page.getByRole('link', { name: 'Create lesson' }).click()
+  await page.waitForURL(/\/coach\/lessons\/new/)
 
   // ── Step 2: Create the lesson ──────────────────────────────────────────────
   // Court 2 is a hard court with lights — safe for a 14:00 slot

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { AdminPage } from '../pages/AdminPage'
 import { PlayerPage } from '../pages/PlayerPage'
-import { adminUrl, playerUrl } from '../helpers/urls'
+import { adminUrl, playerUrl, FIXED_NOW } from '../helpers/urls'
 
 /**
  * E2E 08 — Player cannot cancel within the 4-hour window; admin can force-cancel

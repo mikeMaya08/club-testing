@@ -101,6 +101,68 @@ export class PlayerPage {
     await expect(this.page.getByTestId('cancel-dialog')).not.toBeVisible()
   }
 
+  // ─── Weekly recurring bookings ─────────────────────────────────────────────
+
+  /** Pick the date on the availability grid (yyyy-MM-dd). */
+  async selectDate(isoDate: string) {
+    const input = this.page.getByTestId('date-input')
+    await input.fill(isoDate)
+    await expect(input).toHaveValue(isoDate)
+  }
+
+  /** Step 1 of the booking modal: choose "Every week for N weeks" (1 = just once). */
+  async chooseRepeatWeeks(weeks: 1 | 2 | 4 | 6 | 8) {
+    await this.page.getByTestId('repeat-weeks').selectOption(String(weeks))
+  }
+
+  /** Move from step 1 to the step-3 summary, skipping the optional partner. */
+  async advanceToBookingSummary() {
+    const step = this.page.getByTestId('booking-step')
+    await this.page.getByTestId('booking-next').click()
+    await expect(step).toHaveAttribute('data-step', '2')
+    await this.page.getByTestId('booking-next').click()
+    await expect(step).toHaveAttribute('data-step', '3')
+  }
+
+  /** Confirm from the summary step and wait for the modal to close. */
+  async submitBooking() {
+    await this.page.getByTestId('booking-confirm').click()
+    await expect(this.page.getByTestId('booking-modal')).not.toBeVisible()
+  }
+
+  /** Close the booking modal with its ✕ button. */
+  async closeBookingModal() {
+    await this.page.getByTestId('booking-modal-close').click()
+    await expect(this.page.getByTestId('booking-modal')).not.toBeVisible()
+  }
+
+  /** Toast of a given kind; pass text to avoid matching several stacked toasts. */
+  toast(kind: 'success' | 'error', text?: string | RegExp): Locator {
+    const toasts = this.page.locator(`[data-testid="toast"][data-kind="${kind}"]`)
+    return text ? toasts.filter({ hasText: text }) : toasts
+  }
+
+  /** One row per upcoming booked session (the <li> carries data-status). */
+  upcomingBookedRows(): Locator {
+    return this.page.getByTestId('upcoming-list').locator('li[data-status="booked"]')
+  }
+
+  /** "↻ Weekly series" badges in the Upcoming list. */
+  seriesBadges(): Locator {
+    return this.page.locator('[data-testid^="reservation-series-"]')
+  }
+
+  /** The single "Cancel series (N)" button on the first session of a series. */
+  cancelSeriesButton(): Locator {
+    return this.page.locator(
+      'button[data-testid^="cancel-series-"]' +
+        ':not([data-testid^="cancel-series-dialog"])' +
+        ':not([data-testid="cancel-series-confirm"])' +
+        ':not([data-testid="cancel-series-dismiss"])' +
+        ':not([data-testid*="tooltip"])',
+    )
+  }
+
   // ─── Lessons ───────────────────────────────────────────────────────────────
 
   async enrollInLesson(lessonId: string) {

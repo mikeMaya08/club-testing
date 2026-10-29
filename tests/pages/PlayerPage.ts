@@ -72,6 +72,29 @@ export class PlayerPage {
     await expect(this.page.getByTestId('booking-modal')).not.toBeVisible()
   }
 
+  /** Grid cell for a court/time: data-testid `slot-<courtId>-<HH:MM>`. */
+  slot(courtId: string, start: string): Locator {
+    return this.page.getByTestId(`slot-${courtId}-${start}`)
+  }
+
+  /** Click a specific free slot and wait for the booking modal. */
+  async openSlot(courtId: string, start: string) {
+    await this.slot(courtId, start).click()
+    await expect(this.page.getByTestId('booking-modal')).toBeVisible()
+  }
+
+  /** Steps 1→3 (no partner). Stops on the summary, before confirming. */
+  async advanceToSummary() {
+    await this.page.getByTestId('booking-next').click()
+    await this.page.getByTestId('booking-next').click()
+    await expect(this.page.getByTestId('summary-total')).toBeVisible()
+  }
+
+  /** Error toast raised by any rule violation (auto-dismisses after 3s). */
+  errorToast(): Locator {
+    return this.page.locator('[data-testid="toast"][data-kind="error"]')
+  }
+
   /** Read the price shown on step 3 of the booking modal (opens after step 2). */
   async bookingModalTotalText(): Promise<string | null> {
     return this.page.getByTestId('summary-total').textContent()

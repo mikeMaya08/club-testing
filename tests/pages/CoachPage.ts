@@ -34,8 +34,63 @@ export class CoachPage {
   }
 
   async goToCreateLesson() {
-    await this.nav('New lesson').click()
+    await this.nav('Create lesson').click() // was 'New lesson' (no such link in the app)
+    await expect(this.page).toHaveURL(/\/coach\/lessons\/new/)
     await expect(this.page.getByRole('heading', { name: 'Create lesson' })).toBeVisible()
+  }
+
+  // ─── Create-lesson form (role/label locators: this app has no data-testid) ─
+
+  titleInput()     { return this.page.getByLabel('Title', { exact: true }) }
+  dateInput()      { return this.page.getByLabel('Date', { exact: true }) }
+  startInput()     { return this.page.getByLabel('Start', { exact: true }) }
+  endInput()       { return this.page.getByLabel('End', { exact: true }) }
+  capacityInput()  { return this.page.getByLabel('Capacity', { exact: true }) }
+  courtSelect()    { return this.page.getByRole('combobox', { name: 'Court' }) }
+  templateSelect() { return this.page.getByRole('combobox', { name: 'Template' }) }
+
+  /** Custom dropdown (no native <select>): open the combobox, then pick the option. */
+  async chooseCourt(name: string) {
+    await this.courtSelect().click()
+    await this.page.getByRole('option', { name }).click()
+  }
+
+  async chooseTemplate(name: string) {
+    await this.templateSelect().click()
+    await this.page.getByRole('option', { name }).click()
+  }
+
+  async fillSchedule(opts: { date: string; start: string; end: string }) {
+    await this.dateInput().fill(opts.date)
+    await this.startInput().fill(opts.start)
+    await this.endInput().fill(opts.end)
+  }
+
+  slotFreeBanner() {
+    return this.page.getByText('This slot is free.')
+  }
+
+  conflictAlert() {
+    return this.page.getByRole('alert').filter({ hasText: 'This lesson cannot be scheduled' })
+  }
+
+  // ─── Templates ─────────────────────────────────────────────────────────────
+
+  templatesSection() {
+    return this.page.getByRole('region', { name: 'Templates' })
+  }
+
+  templateRow(name: string) {
+    return this.templatesSection().getByRole('listitem').filter({ hasText: name })
+  }
+
+  async saveAsTemplate(name: string) {
+    await this.page.getByLabel('Save the form above as a template').fill(name)
+    await this.page.getByRole('button', { name: 'Save template' }).click()
+  }
+
+  async deleteTemplate(name: string) {
+    await this.templatesSection().getByRole('button', { name: `Delete template ${name}` }).click()
   }
 
   // ─── Create lesson ─────────────────────────────────────────────────────────

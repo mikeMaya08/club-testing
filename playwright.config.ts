@@ -3,11 +3,18 @@ import { defineConfig, devices } from '@playwright/test'
 /**
  * Each sub-app is deployed independently on Vercel.
  * Tests navigate to absolute URLs — see tests/helpers/urls.ts.
- * Override any of these via environment variables for preview deployments.
+ * URLs come from environment variables (configured in Amikoo, or a local
+ * .env that is NOT committed). The run fails fast if one is missing.
  */
-export const ADMIN_URL  = process.env.ADMIN_URL  ?? 'https://club-admin-omega.vercel.app'
-export const COACH_URL  = process.env.COACH_URL  ?? 'https://club-coach-ten.vercel.app'
-export const PLAYER_URL = process.env.PLAYER_URL ?? 'https://club-player.vercel.app'
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) throw new Error(`Missing required environment variable: ${name}`)
+  return value
+}
+
+export const ADMIN_URL  = requireEnv('ADMIN_URL')
+export const COACH_URL  = requireEnv('COACH_URL')
+export const PLAYER_URL = requireEnv('PLAYER_URL')
 
 export default defineConfig({
   testDir: './tests',

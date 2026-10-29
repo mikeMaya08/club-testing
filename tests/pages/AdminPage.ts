@@ -102,6 +102,22 @@ export class AdminPage {
     await expect(this.page.getByText('Settings saved')).toBeVisible()
   }
 
+  // ─── Courts ────────────────────────────────────────────────────────────────
+
+  courtRow(courtId: string): Locator {
+    return this.page.getByTestId(`court-row-${courtId}`)
+  }
+
+  async deleteCourt(courtId: string) {
+    await this.page.getByTestId(`court-delete-${courtId}`).click()
+    await this.page.getByTestId('court-delete-confirm').click()
+  }
+
+  /** Toast of the given kind (the admin app uses the same Toast as the player app). */
+  toast(kind: 'success' | 'error'): Locator {
+    return this.page.locator(`[data-testid="toast"][data-kind="${kind}"]`)
+  }
+
   // ─── Notifications ─────────────────────────────────────────────────────────
 
   async openNotifications() {

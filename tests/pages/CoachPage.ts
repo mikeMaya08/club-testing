@@ -170,7 +170,8 @@ export class CoachPage {
 
   /** Stars live in the open shadow DOM of <club-rating>; getByRole pierces it. */
   async rate(stars: 1 | 2 | 3 | 4 | 5) {
-    await this.page.getByRole('button', { name: `${stars} star${stars > 1 ? 's' : ''}`, exact: true }).click()
+    // Only the editor's rating is interactive; the history ratings in "Previous notes" are disabled.
+    await this.page.getByRole('button', { name: `${stars} star${stars > 1 ? 's' : ''}`, exact: true, disabled: false }).click()
   }
 
   saveNoteButton(): Locator {

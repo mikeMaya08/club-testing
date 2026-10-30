@@ -46,6 +46,52 @@ export class AdminPage {
     await expect(this.page.getByRole('heading', { name: 'Calendar' })).toBeVisible()
   }
 
+  async goToCourts() {
+    await this.nav('Courts').click()
+    await expect(this.page.getByTestId('courts-page')).toBeVisible()
+  }
+
+  async logout() {
+    await this.page.getByTestId('logout-btn').click()
+    await expect(this.page).toHaveURL(/\/login/)
+  }
+
+  // ─── Courts ────────────────────────────────────────────────────────────────
+
+  /** Court table row located by the court's visible name. */
+  courtRowByName(name: string): Locator {
+    return this.page.locator('[data-testid^="court-row-"]').filter({ hasText: name })
+  }
+
+  /** Fill the "add court" form and submit it. */
+  async addCourt(name: string, surface: 'clay' | 'hard', lights: boolean) {
+    await this.page.getByTestId('court-name-input').fill(name)
+    await this.page.getByTestId('court-surface-select').selectOption(surface)
+    await this.page.getByTestId('court-lights-input').setChecked(lights)
+    await this.page.getByTestId('court-add').click()
+    await expect(this.courtRowByName(name)).toBeVisible()
+  }
+
+  /** Rename a court through its modal (row is located by its current name). */
+  async renameCourt(currentName: string, newName: string) {
+    await this.courtRowByName(currentName).getByRole('button', { name: 'Rename' }).click()
+    await this.page.getByTestId('court-edit-input').fill(newName)
+    await this.page.getByTestId('court-edit-save').click()
+    await expect(this.page.getByTestId('court-edit-dialog')).not.toBeVisible()
+  }
+
+  /** Delete a court and confirm the dialog. */
+  async deleteCourt(name: string) {
+    await this.courtRowByName(name).getByRole('button', { name: 'Delete' }).click()
+    await this.page.getByTestId('court-delete-confirm').click()
+  }
+
+  // ─── Users (roles) ─────────────────────────────────────────────────────────
+
+  async setUserRole(userId: string, role: 'player' | 'coach' | 'admin') {
+    await this.page.getByTestId(`user-role-${userId}`).selectOption(role)
+  }
+
   // ─── Reservations ──────────────────────────────────────────────────────────
 
   /** Find the first reservation row that matches a given status. */

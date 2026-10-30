@@ -25,8 +25,10 @@ test.describe('player: my notes', () => {
     await expect(page.getByTestId('note-text-note-6')).toContainText('Ready to move up a level.')
 
     // Newest note (note-1, 2 days ago) is listed before note-6 (4 days ago)
-    const notes = page.locator('[data-testid^="note-note-"], li[data-testid^="note-"]')
-    await expect(notes.first()).toHaveAttribute('data-testid', 'note-note-1'.replace('note-note', 'note'))
+    // (list item test ids are `note-<noteId>`, and the seeded ids are note-1 / note-6)
+    const items = page.getByTestId('notes-page').getByRole('listitem')
+    await expect(items).toHaveCount(2)
+    await expect(items.first()).toHaveAttribute('data-testid', 'note-note-1')
     await expect(page.getByTestId('notes-empty')).toHaveCount(0)
   })
 

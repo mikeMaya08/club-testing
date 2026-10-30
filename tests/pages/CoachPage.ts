@@ -131,6 +131,52 @@ export class CoachPage {
 
   // ─── Lesson detail ─────────────────────────────────────────────────────────
 
+  // ─── Students & notes ──────────────────────────────────────────────────────
+
+  async goToStudents() {
+    await this.page.getByRole('link', { name: 'Students', exact: true }).click()
+    await expect(this.page).toHaveURL(/\/coach\/students/)
+    await expect(this.page.getByRole('heading', { name: 'Students', exact: true })).toBeVisible()
+  }
+
+  async goToStudentNotes() {
+    await this.page.getByRole('link', { name: 'Student notes' }).click()
+    await expect(this.page).toHaveURL(/\/coach\/notes/)
+    await expect(this.page.getByRole('heading', { name: 'Student notes' })).toBeVisible()
+  }
+
+  /** Roster row of a student on the Students page (nearest ancestor holding the "Add note" link). */
+  rosterRow(name: string): Locator {
+    return this.page.getByText(name).locator('xpath=ancestor::div[.//a[normalize-space()="Add note"]][1]')
+  }
+
+  studentSelect(): Locator {
+    return this.page.getByRole('combobox', { name: 'Student' })
+  }
+
+  async chooseStudent(name: string) {
+    await this.studentSelect().click()
+    await this.page.getByRole('option', { name }).click()
+  }
+
+  /** The note editor is a contentEditable div (no label / testid). */
+  noteEditor(): Locator {
+    return this.page.locator('[contenteditable="true"]')
+  }
+
+  async writeNote(text: string) {
+    await this.noteEditor().fill(text)
+  }
+
+  /** Stars live in the open shadow DOM of <club-rating>; getByRole pierces it. */
+  async rate(stars: 1 | 2 | 3 | 4 | 5) {
+    await this.page.getByRole('button', { name: `${stars} star${stars > 1 ? 's' : ''}`, exact: true }).click()
+  }
+
+  saveNoteButton(): Locator {
+    return this.page.getByRole('button', { name: 'Save note' })
+  }
+
   async openLesson(lessonId: string) {
     await this.page.goto(this.page.url().replace(/\/[^/]*$/, '') + `/lessons/${lessonId}`)
     await expect(this.page.getByRole('link', { name: '‹ Schedule' })).toBeVisible()

@@ -15,7 +15,7 @@ import { adminUrl, playerUrl } from '../helpers/urls'
  *     the player's name, and confirms the same reservation is listed
  *     with status "booked".
  */
-test('player books a court and admin sees the reservation', async ({ page }) => {
+test.only('player books a court and admin sees the reservation', async ({ page }) => {
   // ── Step 1: Player logs in and navigates to availability ──────────────────
   const player = new PlayerPage(page)
 

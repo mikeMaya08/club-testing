@@ -122,4 +122,22 @@ export class PlayerPage {
   notificationWithText(text: string): Locator {
     return this.page.getByTestId('notification-dropdown').getByText(text)
   }
+
+  // ─── Lessons by title (lesson ids are generated at runtime) ────────────────
+
+  /** The lesson card on the Lessons page that contains the given title. */
+  lessonCardByTitle(title: string): Locator {
+    return this.page.getByTestId('lessons-page').getByRole('listitem').filter({ hasText: title })
+  }
+
+  lessonCardSeats(title: string): Locator {
+    return this.lessonCardByTitle(title).locator('[data-testid^="lesson-seats-"]')
+  }
+
+  async enrollInLessonByTitle(title: string) {
+    const card = this.lessonCardByTitle(title)
+    await card.getByRole('button', { name: 'Enroll' }).click()
+    // The Enroll button is replaced by Leave once enrolment succeeds
+    await expect(card.getByRole('button', { name: 'Leave', exact: true })).toBeVisible()
+  }
 }

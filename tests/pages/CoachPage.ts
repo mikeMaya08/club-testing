@@ -151,4 +151,45 @@ export class CoachPage {
     // Wait for the pill to become active (aria-pressed="true")
     await expect(btn).toHaveAttribute('aria-pressed', 'true')
   }
+
+  // ─── Lesson journey helpers (create → enrolment → attendance) ──────────────
+
+  /**
+   * Fill the Create Lesson form with the label-based locators above and submit it.
+   * Waits for the redirect to the new lesson's detail page.
+   */
+  async createLessonFromForm(opts: {
+    title: string
+    courtName: string
+    date: string   // yyyy-MM-dd
+    start: string  // HH:mm
+    end: string    // HH:mm
+    capacity: number
+  }) {
+    await this.titleInput().fill(opts.title)
+    await this.chooseCourt(opts.courtName)
+    await this.fillSchedule({ date: opts.date, start: opts.start, end: opts.end })
+    await this.capacityInput().fill(String(opts.capacity))
+
+    // Live conflict check must report the slot as free before we submit
+    await expect(this.slotFreeBanner()).toBeVisible()
+    await this.page.getByRole('button', { name: 'Create lesson' }).click()
+
+    // Redirected to /coach/lessons/<id> (not /lessons/new)
+    await expect(this.page).toHaveURL(/\/coach\/lessons\/(?!new\b)[^/?]+/)
+  }
+
+  lessonHeading(title: string): Locator {
+    return this.page.getByRole('heading', { name: title })
+  }
+
+  /** Open a lesson from the schedule agenda by clicking its title. */
+  async openLessonFromSchedule(title: string) {
+    await this.page.getByText(title).first().click()
+    await expect(this.lessonHeading(title)).toBeVisible()
+  }
+
+  attendanceButton(studentName: string, value: 'present' | 'no-show'): Locator {
+    return this.studentRow(studentName).getByRole('button', { name: value === 'present' ? 'Present' : 'No-show' })
+  }
 }

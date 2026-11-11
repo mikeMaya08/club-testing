@@ -5,16 +5,12 @@ import { defineConfig, devices } from '@playwright/test'
  * Tests navigate to absolute URLs — see tests/helpers/urls.ts.
  * URLs come from environment variables (configured in Amikoo, or a local
  * .env that is NOT committed). The run fails fast if one is missing.
+ *
+ * Note: ADMIN_URL, COACH_URL and PLAYER_URL are consumed by
+ * tests/helpers/urls.ts (with safe fallback defaults). They must NOT be
+ * validated here at config-load time, because Playwright loads this file
+ * before any env vars from the executor are injected.
  */
-function requireEnv(name: string): string {
-  const value = process.env[name]
-  if (!value) throw new Error(`Missing required environment variable: ${name}`)
-  return value
-}
-
-export const ADMIN_URL  = requireEnv('ADMIN_URL')
-export const COACH_URL  = requireEnv('COACH_URL')
-export const PLAYER_URL = requireEnv('PLAYER_URL')
 
 export default defineConfig({
   testDir: './tests',

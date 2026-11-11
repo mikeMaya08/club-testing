@@ -112,4 +112,90 @@ export class AdminPage {
   notificationWithText(text: string): Locator {
     return this.page.getByTestId('notification-dropdown').getByText(text)
   }
+
+  // ─── Toasts / session ──────────────────────────────────────────────────────
+
+  /** A toast (success or error) containing the given text. */
+  toast(text: string | RegExp): Locator {
+    return this.page.getByTestId('toast').filter({ hasText: text })
+  }
+
+  async logout() {
+    await this.page.getByTestId('logout-btn').click()
+    await expect(this.page).toHaveURL(/\/login/)
+  }
+
+  // ─── Courts ────────────────────────────────────────────────────────────────
+
+  async goToCourts() {
+    await this.page.getByRole('link', { name: 'Courts', exact: true }).click()
+    await expect(this.page.getByTestId('courts-page')).toBeVisible()
+  }
+
+  /** Fill and submit the "Add court" form. */
+  async addCourt(name: string, surface: 'clay' | 'hard', lights: boolean) {
+    await this.page.getByTestId('court-name-input').fill(name)
+    await this.page.getByTestId('court-surface-select').selectOption(surface)
+    await this.page.getByTestId('court-lights-input').setChecked(lights)
+    await this.page.getByTestId('court-add').click()
+  }
+
+  /** Courts table row whose name cell matches exactly (useful for courts created in the test). */
+  courtRowByName(name: string): Locator {
+    return this.page
+      .locator('[data-testid^="court-row-"]')
+      .filter({ has: this.page.getByText(name, { exact: true }) })
+  }
+
+  async renameCourt(courtId: string, newName: string) {
+    await this.page.getByTestId(`court-edit-${courtId}`).click()
+    await this.page.getByTestId('court-edit-input').fill(newName)
+    await this.page.getByTestId('court-edit-save').click()
+  }
+
+  /** Open the delete dialog and confirm it. */
+  async deleteCourt(courtId: string) {
+    await this.page.getByTestId(`court-delete-${courtId}`).click()
+    await this.page.getByTestId('court-delete-confirm').click()
+  }
+
+  // ─── Reservations table ────────────────────────────────────────────────────
+
+  /** Rows currently rendered in the reservations table (current page only). */
+  reservationRows(): Locator {
+    return this.page.locator('[data-testid^="res-row-"]')
+  }
+
+  /** Text of every cell with the given testid prefix, e.g. 'res-price-' or 'res-date-'. */
+  async reservationColumn(prefix: 'res-date-' | 'res-court-' | 'res-player-' | 'res-status-' | 'res-price-'): Promise<string[]> {
+    return this.page.locator(`[data-testid^="${prefix}"]`).allTextContents()
+  }
+
+  async sortBy(key: 'date' | 'court' | 'player' | 'status' | 'price') {
+    await this.page.getByTestId(`sort-${key}`).click()
+  }
+
+  /** The <th> that wraps a sort button (carries aria-sort). */
+  sortHeader(key: 'date' | 'court' | 'player' | 'status' | 'price'): Locator {
+    return this.page.locator('th').filter({ has: this.page.getByTestId(`sort-${key}`) })
+  }
+
+  /** Click "Export CSV" and return the triggered download. */
+  async exportCsv() {
+    const downloadPromise = this.page.waitForEvent('download')
+    await this.page.getByTestId('export-csv').click()
+    return downloadPromise
+  }
+
+  // ─── Users ─────────────────────────────────────────────────────────────────
+
+  async setUserRole(userId: string, role: 'player' | 'coach' | 'admin') {
+    await this.page.getByTestId(`user-role-${userId}`).selectOption(role)
+  }
+
+  // ─── Settings (generic) ────────────────────────────────────────────────────
+
+  async setSetting(key: string, value: string) {
+    await this.page.getByTestId(`setting-${key}`).fill(value)
+  }
 }

@@ -110,13 +110,11 @@ export class CoachPage {
   }): Promise<string> {
     const { title, courtName, date, start, end, capacity = 4 } = opts
 
-    await this.page.getByPlaceholder('Serve clinic').fill(title)
-    await this.page.getByText('Choose a court').click()
-    await this.page.getByRole('option', { name: courtName }).click()
-    await this.page.locator('input[type="date"]').fill(date)
-    await this.page.locator('input[type="time"]').first().fill(start)
-    await this.page.locator('input[type="time"]').last().fill(end)
-    await this.page.locator('input[type="number"]').fill(String(capacity))
+    // Label/role locators match the current form (same helpers used by spec 11/12)
+    await this.titleInput().fill(title)
+    await this.chooseCourt(courtName)
+    await this.fillSchedule({ date, start, end })
+    await this.capacityInput().fill(String(capacity))
 
     // The green "This slot is free" banner should appear before submitting
     await expect(this.page.getByText('This slot is free')).toBeVisible()

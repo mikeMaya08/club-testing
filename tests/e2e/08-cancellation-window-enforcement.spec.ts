@@ -32,8 +32,8 @@ test('player cancel is blocked inside the window; admin can still force-cancel',
   // Find a cancel button that is disabled — the app may use either the HTML
   // `disabled` attribute or `aria-disabled="true"` for the cancel-window guard.
   const disabledCancelBtn = page
-    .locator('[data-testid^="cancel-btn-"]')
-    .filter({ has: page.locator('[disabled], [aria-disabled="true"]') })
+    // Match the attribute on the button itself (`has:` only looks at descendants)
+    .locator('[data-testid^="cancel-btn-"]:is([disabled], [aria-disabled="true"])')
     .first()
 
   await expect(disabledCancelBtn).toBeVisible()

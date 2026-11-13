@@ -108,6 +108,34 @@ export class PlayerPage {
     await expect(this.page.getByTestId(`lesson-leave-${lessonId}`)).toBeVisible()
   }
 
+  async leaveLesson(lessonId: string) {
+    await this.page.getByTestId(`lesson-leave-${lessonId}`).click()
+    await expect(this.page.getByTestId(`lesson-enroll-${lessonId}`)).toBeVisible()
+  }
+
+  /** Join the waitlist of a full lesson and wait for the position message. */
+  async joinWaitlist(lessonId: string) {
+    await this.page.getByTestId(`lesson-waitlist-join-${lessonId}`).click()
+    await expect(this.waitlistPosition(lessonId)).toBeVisible()
+  }
+
+  async leaveWaitlist(lessonId: string) {
+    await this.page.getByTestId(`lesson-waitlist-leave-${lessonId}`).click()
+    await expect(this.waitlistPosition(lessonId)).toHaveCount(0)
+  }
+
+  /** "You are #N on the waitlist..." message (absent when not waitlisted). */
+  waitlistPosition(lessonId: string): Locator {
+    return this.page.getByTestId(`lesson-waitlist-pos-${lessonId}`)
+  }
+
+  // ─── Notes ─────────────────────────────────────────────────────────────────
+
+  async goToNotes() {
+    await this.page.getByTestId('nav-notes').click()
+    await expect(this.page.getByTestId('notes-page')).toBeVisible()
+  }
+
   lessonSeatsLeft(lessonId: string): Locator {
     return this.page.getByTestId(`lesson-seats-${lessonId}`)
   }

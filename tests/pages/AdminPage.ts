@@ -73,6 +73,45 @@ export class AdminPage {
     await this.page.getByTestId('filter-status').selectOption(status)
   }
 
+  // ─── Reservations: bulk actions ────────────────────────────────────────────
+
+  get selectPageCheckbox(): Locator {
+    return this.page.getByTestId('select-page')
+  }
+
+  get bulkBar(): Locator {
+    return this.page.getByTestId('bulk-bar')
+  }
+
+  get bulkCount(): Locator {
+    return this.page.getByTestId('bulk-count')
+  }
+
+  get bulkResultSummary(): Locator {
+    return this.page.getByTestId('bulk-result-summary')
+  }
+
+  /** Row checkbox for a reservation (enabled only for booked rows). */
+  rowCheckbox(resId: string): Locator {
+    return this.page.getByTestId(`res-select-${resId}`)
+  }
+
+  /** Reservation ids of the booked rows currently rendered on the page. */
+  async visibleBookedIds(): Promise<string[]> {
+    const rows = this.page.locator('[data-testid^="res-row-"][data-status="booked"]')
+    const testIds = await rows.evaluateAll((els) => els.map((e) => e.getAttribute('data-testid') ?? ''))
+    return testIds.map((t) => t.replace('res-row-', ''))
+  }
+
+  async bulkCancelSelected() {
+    await this.page.getByTestId('bulk-cancel').click()
+    await this.page.getByTestId('bulk-cancel-confirm').click()
+  }
+
+  async bulkMarkNoShow() {
+    await this.page.getByTestId('bulk-noshow').click()
+  }
+
   // ─── Users ─────────────────────────────────────────────────────────────────
 
   async setUserActive(userId: string, active: boolean) {

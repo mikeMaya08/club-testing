@@ -34,7 +34,7 @@ test('admin cancels reservation and player is notified', async ({ page }) => {
   // ── Step 2: Clear the status filter so the cancelled row is still visible ──
   // The "booked" filter hides cancelled rows; clear it to see the updated status.
   await page.getByTestId('filter-clear').click()
-  await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('cancelled')
+  await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('canceled') // app renders US spelling in the status cell
 
   // ── Step 3: Player checks their History tab ────────────────────────────────
   // The player app is on a different origin — it has its own localStorage.

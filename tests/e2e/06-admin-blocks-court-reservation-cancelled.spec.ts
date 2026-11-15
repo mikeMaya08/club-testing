@@ -47,7 +47,7 @@ test('admin court block cancels overlapping reservation and notifies player', as
 
   // Clear the booked filter so the now-cancelled row stays visible
   await page.getByTestId('filter-clear').click()
-  await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('cancelled')
+  await expect(page.getByTestId(`res-status-${resId}`)).toHaveText('canceled') // app renders US spelling in the status cell
 
   // ── Step 3: Calendar block warning appears for new overlapping drags ───────
   // Navigate to Calendar; open the block dialog via the pre-seeded maintenance

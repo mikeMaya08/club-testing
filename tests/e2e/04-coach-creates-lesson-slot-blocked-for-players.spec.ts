@@ -18,8 +18,8 @@ test('coach creates lesson and slot is blocked for players', async ({ page }) =>
   const coach = new CoachPage(page)
 
   // ── Step 1: Coach logs in and goes straight to the Create Lesson page ──────
-  // Navigate directly to /coach/create to avoid fragile nav-link clicks
-  await page.goto(coachUrl('create', { seed: 'empty', as: 'coach-1', reset: true }))
+  // The create-lesson route is /coach/lessons/new (/coach/create does not exist and redirects to /coach)
+  await page.goto(coachUrl('lessons/new', { seed: 'empty', as: 'coach-1', reset: true }))
 
   // ── Step 2: Create the lesson ──────────────────────────────────────────────
   // Court 2 is a hard court with lights — safe for a 14:00 slot
